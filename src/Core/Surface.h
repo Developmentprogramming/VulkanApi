@@ -12,10 +12,13 @@ namespace VulkanApi
 {
     class Surface
     {
+    public:
         Surface(Window& window, Instance& instance);
 
         inline Window& GetWindow() { return m_Window; }
         inline Instance& GetInstance() { return m_Instance; }
+
+        inline VkSurfaceKHR& GetVkSurface() { return m_Surface; }
 
     private:
         Window& m_Window;

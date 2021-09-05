@@ -20,6 +20,9 @@ namespace VulkanApi
         inline VkInstance& GetVkInstance() { return m_Instance; }
         inline VkDebugUtilsMessengerEXT& GetVkDebugMessenger() { return m_DebugMessenger; }
 
+        inline const std::vector<const char*>& GetValidationLayers() const { return m_ValidationLayers; }
+        inline bool GetValidationLayersEnabled() const { return m_EnableValidationLayers; }
+
     private:
         bool CheckValidationLayerSupport() noexcept;
         std::vector<const char*> GetRequiredExtension() const noexcept;
