@@ -12,14 +12,14 @@ namespace VulkanApi
 {
     class Surface
     {
-        Surface();
+        Surface(Window& window, Instance& instance);
 
         inline Window& GetWindow() { return m_Window; }
         inline Instance& GetInstance() { return m_Instance; }
 
     private:
-        Window m_Window;
-        Instance m_Instance;
+        Window& m_Window;
+        Instance& m_Instance;
 
         VkSurfaceKHR m_Surface;
     };

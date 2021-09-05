@@ -12,8 +12,8 @@
 namespace VulkanApi
 {
 
-    Surface::Surface()
-        : m_Window(800, 600), m_Instance({ "VK_LAYER_KHRONOS_validation" })
+    Surface::Surface(Window& window, Instance& instance)
+        : m_Window(window), m_Instance(instance)
     {
         if (glfwCreateWindowSurface(m_Instance.GetVkInstance(), m_Window.GetWindow(), nullptr, &m_Surface) != VK_SUCCESS)
             throw std::runtime_error("Failed to create surface!");
