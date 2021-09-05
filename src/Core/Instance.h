@@ -17,8 +17,8 @@ namespace VulkanApi
         Instance(const std::initializer_list<const char*>& validationLayers);
         virtual ~Instance();
 
-        inline VkInstance& GetInstance() { return m_Instance; }
-        inline VkDebugUtilsMessengerEXT& GetDebugMessenger() { return m_DebugMessenger; }
+        inline VkInstance& GetVkInstance() { return m_Instance; }
+        inline VkDebugUtilsMessengerEXT& GetVkDebugMessenger() { return m_DebugMessenger; }
 
     private:
         bool CheckValidationLayerSupport() noexcept;

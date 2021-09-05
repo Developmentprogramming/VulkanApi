@@ -19,8 +19,9 @@ namespace VulkanApi
 
         inline uint32_t GetWidth() const { return m_Width; }
         inline uint32_t GetHeight() const { return m_Height; }
-        inline std::string& GetTitle() { return m_Title; }
         inline const std::string& GetTitle() const { return m_Title; }
+
+        inline GLFWwindow* GetWindow() { return m_Window; }
 
     private:
         GLFWwindow* m_Window;
@@ -28,6 +29,7 @@ namespace VulkanApi
         std::string m_Title;
 
         static bool s_Initialized;
+        static Window* s_Instance;
     };
 }
 
