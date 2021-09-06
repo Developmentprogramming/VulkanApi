@@ -28,6 +28,8 @@ namespace VulkanApi
         inline VkExtent2D& GetVkExtent() { return m_Extent; }
 
         inline SupportDetails GetSupportDetails() { return m_Details; }
+        inline std::vector<VkImage>& GetImages() { return m_Images; }
+        inline std::vector<VkImageView>& GetImageViews() { return m_ImageViews; }
 
     private:
         SupportDetails QuerySupport();
@@ -50,6 +52,7 @@ namespace VulkanApi
         std::vector<VkImage> m_Images;
         VkFormat m_Format;
         VkExtent2D m_Extent;
+        std::vector<VkImageView> m_ImageViews;
 
     };
 }
