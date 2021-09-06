@@ -28,6 +28,7 @@ namespace VulkanApi
         void PickSuitableDevice();
 
         QueueFamilyDetails GetQueueFamilyProperties(VkPhysicalDevice device);
+        QueueFamilyDetails GetQueueFamilyProperties();
 
         inline VkPhysicalDevice& GetVkPhysicalDevice() { return m_PhysicalDevice; }
 
@@ -45,10 +46,14 @@ namespace VulkanApi
         std::vector<VkPhysicalDevice> m_Devices;
     };
 
-    class LogicalDevice
+    class Device
     {
     public:
-        LogicalDevice(const std::initializer_list<const char*> deviceExtensions, PhysicalDevice& device);
+        Device(const std::initializer_list<const char*>& deviceExtensions, PhysicalDevice& device);
+
+        inline PhysicalDevice& GetPhysicalDevice() { return m_PhysicalDevice; }
+
+        inline VkDevice& GetVkDevice() { return m_Device; }
 
     private:
         PhysicalDevice& m_PhysicalDevice;

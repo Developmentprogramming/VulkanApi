@@ -70,14 +70,19 @@ namespace VulkanApi
         return indices;
     }
 
+    PhysicalDevice::QueueFamilyDetails PhysicalDevice::GetQueueFamilyProperties()
+    {
+        return GetQueueFamilyProperties(m_PhysicalDevice);
+    }
+
     // ==================================================================================
     // Logical Device ===================================================================
     // ==================================================================================
 
-    LogicalDevice::LogicalDevice(const std::initializer_list<const char*> deviceExtensions, PhysicalDevice &device)
+    Device::Device(const std::initializer_list<const char*>& deviceExtensions, PhysicalDevice &device)
         : m_DeviceExtensions(deviceExtensions), m_PhysicalDevice(device)
     {
-        PhysicalDevice::QueueFamilyDetails indices = m_PhysicalDevice.GetQueueFamilyProperties(m_PhysicalDevice.GetVkPhysicalDevice());
+        PhysicalDevice::QueueFamilyDetails indices = m_PhysicalDevice.GetQueueFamilyProperties();
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
