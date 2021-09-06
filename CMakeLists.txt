@@ -9,4 +9,4 @@ if (VULKAN_API_DEBUG)
 endif(VULKAN_API_DEBUG)
 
 set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} ${LINK_ARGS})
-add_executable(VulkanApi src/main.cpp src/Core/Instance.cpp src/Core/Instance.h src/Core/Window.cpp src/Core/Window.h src/Core/Surface.cpp src/Core/Surface.h src/Core/Device.cpp src/Core/Device.h src/Core/SwapChain.cpp src/Core/SwapChain.h)
+add_executable(VulkanApi src/main.cpp src/Core/Instance.cpp src/Core/Instance.h src/Core/Window.cpp src/Core/Window.h src/Core/Surface.cpp src/Core/Surface.h src/Core/Device.cpp src/Core/Device.h src/Core/SwapChain.cpp src/Core/SwapChain.h src/Core/Queue.cpp src/Core/Queue.h)

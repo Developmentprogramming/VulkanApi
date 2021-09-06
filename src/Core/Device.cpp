@@ -4,7 +4,9 @@
 
 #include <stdexcept>
 #include <set>
+
 #include "Device.h"
+#include "Queue.h"
 
 namespace VulkanApi
 {
@@ -118,5 +120,10 @@ namespace VulkanApi
 
         if (vkCreateDevice(m_PhysicalDevice.GetVkPhysicalDevice(), &deviceCreateInfo, nullptr, &m_Device) != VK_SUCCESS)
             throw std::runtime_error("Failed to create logical device!");
+    }
+
+    Queue Device::GetQueue(uint32_t queueFamilyIndex, uint32_t queueIndex)
+    {
+        return Queue(*this, queueFamilyIndex, queueIndex);
     }
 }

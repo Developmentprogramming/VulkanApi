@@ -46,6 +46,8 @@ namespace VulkanApi
         std::vector<VkPhysicalDevice> m_Devices;
     };
 
+    class Queue; // Predefined to avoid recursive include error
+
     class Device
     {
     public:
@@ -54,6 +56,8 @@ namespace VulkanApi
         inline PhysicalDevice& GetPhysicalDevice() { return m_PhysicalDevice; }
 
         inline VkDevice& GetVkDevice() { return m_Device; }
+
+        Queue GetQueue(uint32_t queueFamilyIndex, uint32_t queueFamily);
 
     private:
         PhysicalDevice& m_PhysicalDevice;
