@@ -23,6 +23,11 @@ namespace VulkanApi
             throw std::runtime_error("Failed to create shader module!");
     }
 
+    ShaderModule::~ShaderModule()
+    {
+        vkDestroyShaderModule(m_Device.GetVkDevice(), m_ShaderModule, nullptr);
+    }
+
     VkPipelineShaderStageCreateInfo ShaderModule::GetShaderStageCreateInfo(const std::string& entryName) const
     {
         VkPipelineShaderStageCreateInfo createInfo;

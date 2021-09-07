@@ -10,6 +10,8 @@
  */
 
 #include "Device.h"
+#include "RenderPass.h"
+#include "ShaderModule.h"
 
 namespace VulkanApi
 {
@@ -34,14 +36,26 @@ namespace VulkanApi
         GraphicsPipeline();
     };
 
-    class PipelineLayout
+    class Pipeline
     {
     public:
-        PipelineLayout(Device& device);
+        Pipeline(Device& device, RenderPass& renderPass, Shader& shader,
+                 VkPipelineVertexInputStateCreateInfo& vertexInputStateCreateInfo,
+                 VkPipelineInputAssemblyStateCreateInfo& inputAssemblyStateCreateInfo,
+                 VkPipelineViewportStateCreateInfo& viewportStateCreateInfo,
+                 VkPipelineRasterizationStateCreateInfo& rasterizationStateCreateInfo,
+                 VkPipelineMultisampleStateCreateInfo& multisampleStateCreateInfo,
+                 VkPipelineColorBlendStateCreateInfo& colorBlendStateCreateInfo,
+                 VkPipelineDepthStencilStateCreateInfo& depthStencilStateCreateInfo,
+                 VkPipelineDynamicStateCreateInfo& dynamicStateCreateInfo);
 
     private:
         Device& m_Device;
+        RenderPass& m_RenderPass;
+        Shader& m_Shader;
+
         VkPipelineLayout m_PipelineLayout;
+        VkPipeline m_Pipeline;
     };
 }
 

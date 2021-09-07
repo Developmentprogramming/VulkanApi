@@ -19,6 +19,7 @@ namespace VulkanApi
     {
     public:
         ShaderModule(Device& device, ShaderType type, const char* code);
+        virtual ~ShaderModule();
 
         VkPipelineShaderStageCreateInfo GetShaderStageCreateInfo(const std::string& entryName = "main") const;
 
@@ -37,6 +38,7 @@ namespace VulkanApi
         Shader(Device& device, const std::string& vertSrc, const std::string& fragSrc);
 
         std::vector<VkPipelineShaderStageCreateInfo> GetVkShaderModules();
+        inline std::vector<ShaderModule>& GetShaderModules() { return m_ShaderModules; }
 
     private:
         static std::string ReadFile(const std::string& filename);

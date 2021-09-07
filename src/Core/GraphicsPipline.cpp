@@ -82,13 +82,44 @@ namespace VulkanApi
     // Pipeline Layout ================================================
     // ================================================================
 
-    PipelineLayout::PipelineLayout(Device &device)
-        : m_Device(device)
+
+    Pipeline::Pipeline(Device &device, RenderPass &renderPass, Shader &shader,
+                       VkPipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo,
+                       VkPipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo,
+                       VkPipelineViewportStateCreateInfo &viewportStateCreateInfo,
+                       VkPipelineRasterizationStateCreateInfo &rasterizationStateCreateInfo,
+                       VkPipelineMultisampleStateCreateInfo &multisampleStateCreateInfo,
+                       VkPipelineColorBlendStateCreateInfo &colorBlendStateCreateInfo,
+                       VkPipelineDepthStencilStateCreateInfo &depthStencilStateCreateInfo,
+                       VkPipelineDynamicStateCreateInfo &dynamicStateCreateInfo)
+        : m_Device(device), m_RenderPass(renderPass), m_Shader(shader)
     {
         VkPipelineLayoutCreateInfo createInfo;
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
         if (vkCreatePipelineLayout(m_Device.GetVkDevice(), &createInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
             throw std::runtime_error("Failed to create pipeline layout!");
+
+        VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo {};
+        graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        auto shaderStages = m_Shader.GetVkShaderModules();
+        graphicsPipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
+        graphicsPipelineCreateInfo.pStages = shaderStages.data();
+        graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
+        graphicsPipelineCreateInfo.pInputAssemblyState = &inputAssemblyStateCreateInfo;
+        graphicsPipelineCreateInfo.pViewportState = &viewportStateCreateInfo;
+        graphicsPipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
+        graphicsPipelineCreateInfo.pMultisampleState = &multisampleStateCreateInfo;
+        graphicsPipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
+        graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilStateCreateInfo;
+        graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
+        graphicsPipelineCreateInfo.layout = m_PipelineLayout;
+        graphicsPipelineCreateInfo.renderPass = m_RenderPass.GetVkRenderPass();
+        graphicsPipelineCreateInfo.subpass = 0;
+        graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
+        graphicsPipelineCreateInfo.basePipelineIndex = -1;
+
+        if (vkCreateGraphicsPipelines(m_Device.GetVkDevice(), VK_NULL_HANDLE, (uint32_t)1, &graphicsPipelineCreateInfo, nullptr, &m_Pipeline) != VK_SUCCESS)
+            throw std::runtime_error("Failed to create graphics pipeline!");
     }
 }
