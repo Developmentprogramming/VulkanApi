@@ -8,6 +8,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include "RenderPass.h"
+
 namespace VulkanApi
 {
 
@@ -83,6 +85,28 @@ namespace VulkanApi
 
             if (vkCreateImageView(m_Device.GetVkDevice(), &imageViewCreateInfo, nullptr, &m_ImageViews[0]) != VK_SUCCESS)
                 throw std::runtime_error("Failed to create image view!");
+        }
+    }
+
+    void SwapChain::CreateFrameBuffers(RenderPass &renderPass)
+    {
+        m_FrameBuffers.resize(m_ImageViews.size());
+
+        for (size_t i = 0; i < m_FrameBuffers.size(); i++)
+        {
+            VkImageView attachments[] = { m_ImageViews[i] };
+
+            VkFramebufferCreateInfo framebufferCreateInfo {};
+            framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            framebufferCreateInfo.renderPass = renderPass.GetVkRenderPass();
+            framebufferCreateInfo.attachmentCount = 1;
+            framebufferCreateInfo.pAttachments = attachments;
+            framebufferCreateInfo.width = m_Extent.width;
+            framebufferCreateInfo.height = m_Extent.height;
+            framebufferCreateInfo.layers = 1;
+
+            if (vkCreateFramebuffer(m_Device.GetVkDevice(), &framebufferCreateInfo, nullptr, &m_FrameBuffers[i]) != VK_SUCCESS)
+                throw std::runtime_error("Failed to create frame buffer!");
         }
     }
 

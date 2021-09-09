@@ -10,6 +10,8 @@
 
 namespace VulkanApi
 {
+    class RenderPass; // Predefined to avoid recursive include error!
+
     class SwapChain
     {
     public:
@@ -23,6 +25,8 @@ namespace VulkanApi
     public:
         SwapChain(Window& window, Device& device, Surface& surface);
 
+        void CreateFrameBuffers(RenderPass& renderPass);
+
         inline VkSwapchainKHR& GetVkSwapChain() { return m_SwapChain; }
         inline VkFormat& GetVkFormat() { return m_Format; }
         inline VkExtent2D& GetVkExtent() { return m_Extent; }
@@ -30,6 +34,8 @@ namespace VulkanApi
         inline SupportDetails GetSupportDetails() { return m_Details; }
         inline std::vector<VkImage>& GetImages() { return m_Images; }
         inline std::vector<VkImageView>& GetImageViews() { return m_ImageViews; }
+        inline std::vector<VkFramebuffer>& GetFrameBuffers() { return m_FrameBuffers; }
+        inline bool IsFrameBuffersExists() const { return !m_FrameBuffers.empty(); }
 
     private:
         SupportDetails QuerySupport();
@@ -53,6 +59,7 @@ namespace VulkanApi
         VkFormat m_Format;
         VkExtent2D m_Extent;
         std::vector<VkImageView> m_ImageViews;
+        std::vector<VkFramebuffer> m_FrameBuffers;
 
     };
 }
