@@ -49,6 +49,9 @@ namespace VulkanApi
                  VkPipelineDepthStencilStateCreateInfo& depthStencilStateCreateInfo,
                  VkPipelineDynamicStateCreateInfo& dynamicStateCreateInfo);
 
+        inline VkPipelineLayout& GetVkPipelineLayout() { return m_PipelineLayout; }
+        inline VkPipeline& GetVkPipeline() { return m_Pipeline; }
+
     private:
         Device& m_Device;
         RenderPass& m_RenderPass;

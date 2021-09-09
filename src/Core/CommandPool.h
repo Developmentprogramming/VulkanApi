@@ -14,6 +14,9 @@ namespace VulkanApi
     public:
         CommandPool(Device& device);
 
+        inline VkCommandPool& GetVkCommandPool() { return m_CommandPool; }
+        inline Device& GetDevice() { return m_Device; }
+
     private:
         Device& m_Device;
 
