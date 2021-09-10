@@ -14,7 +14,7 @@ namespace VulkanApi
 
     VkPipelineVertexInputStateCreateInfo GraphicsPipeline::GetVertexInputStateCreateInfo()
     {
-        VkPipelineVertexInputStateCreateInfo createInfo;
+        VkPipelineVertexInputStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         createInfo.vertexAttributeDescriptionCount = 0;
         createInfo.pVertexAttributeDescriptions = nullptr;
@@ -26,7 +26,7 @@ namespace VulkanApi
 
     VkPipelineInputAssemblyStateCreateInfo GraphicsPipeline::GetInputAssemblyCreateInfo()
     {
-        VkPipelineInputAssemblyStateCreateInfo createInfo;
+        VkPipelineInputAssemblyStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         createInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         createInfo.primitiveRestartEnable = VK_FALSE;
@@ -35,18 +35,19 @@ namespace VulkanApi
 
     VkPipelineViewportStateCreateInfo GraphicsPipeline::GetViewportStateCreateInfo(const std::vector<VkViewport> &viewports, const std::vector<VkRect2D> &scissors)
     {
-        VkPipelineViewportStateCreateInfo createInfo;
+        VkPipelineViewportStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         createInfo.viewportCount = (uint32_t)viewports.size();
         createInfo.pViewports = viewports.data();
         createInfo.scissorCount = (uint32_t)scissors.size();
         createInfo.pScissors = scissors.data();
+        createInfo.flags = 0;
         return createInfo;
     }
 
     VkPipelineRasterizationStateCreateInfo GraphicsPipeline::GetRasterizationStateCreateInfo()
     {
-        VkPipelineRasterizationStateCreateInfo createInfo;
+        VkPipelineRasterizationStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         createInfo.depthClampEnable = VK_FALSE;
         createInfo.rasterizerDiscardEnable = VK_FALSE;
@@ -55,21 +56,27 @@ namespace VulkanApi
         createInfo.cullMode = VK_CULL_MODE_BACK_BIT;
         createInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
         createInfo.depthBiasEnable = VK_FALSE;
+        createInfo.flags = 0;
         return createInfo;
     }
 
     VkPipelineMultisampleStateCreateInfo GraphicsPipeline::GetMultisampleStateCreateInfo()
     {
-        VkPipelineMultisampleStateCreateInfo createInfo;
+        VkPipelineMultisampleStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         createInfo.sampleShadingEnable = VK_FALSE;
         createInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        createInfo.flags = 0;
+        createInfo.alphaToCoverageEnable = VK_FALSE;
+        createInfo.alphaToOneEnable = VK_FALSE;
+        createInfo.minSampleShading = 1.0f;
+        createInfo.pSampleMask = nullptr;
         return createInfo;
     }
 
     VkPipelineColorBlendStateCreateInfo GraphicsPipeline::GetColorBlendStateCreateInfo(const std::vector<VkPipelineColorBlendAttachmentState> &colorAttachments)
     {
-        VkPipelineColorBlendStateCreateInfo createInfo;
+        VkPipelineColorBlendStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
         createInfo.logicOpEnable = VK_FALSE;
         createInfo.logicOp = VK_LOGIC_OP_COPY;
@@ -84,20 +91,26 @@ namespace VulkanApi
 
 
     Pipeline::Pipeline(Device &device, RenderPass &renderPass, Shader &shader,
-                       VkPipelineVertexInputStateCreateInfo &vertexInputStateCreateInfo,
-                       VkPipelineInputAssemblyStateCreateInfo &inputAssemblyStateCreateInfo,
-                       VkPipelineViewportStateCreateInfo &viewportStateCreateInfo,
-                       VkPipelineRasterizationStateCreateInfo &rasterizationStateCreateInfo,
-                       VkPipelineMultisampleStateCreateInfo &multisampleStateCreateInfo,
-                       VkPipelineColorBlendStateCreateInfo &colorBlendStateCreateInfo,
-                       VkPipelineDepthStencilStateCreateInfo &depthStencilStateCreateInfo,
-                       VkPipelineDynamicStateCreateInfo &dynamicStateCreateInfo)
+                       VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo,
+                       VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo,
+                       VkPipelineViewportStateCreateInfo viewportStateCreateInfo,
+                       VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo,
+                       VkPipelineMultisampleStateCreateInfo multisampleStateCreateInfo,
+                       VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo,
+                       VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo,
+                       VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo)
         : m_Device(device), m_RenderPass(renderPass), m_Shader(shader)
     {
-        VkPipelineLayoutCreateInfo createInfo;
-        createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
+        pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutCreateInfo.setLayoutCount = 0;
+        pipelineLayoutCreateInfo.pSetLayouts = nullptr;
+        pipelineLayoutCreateInfo.pushConstantRangeCount = 0;
+        pipelineLayoutCreateInfo.pPushConstantRanges = nullptr;
+        pipelineLayoutCreateInfo.pNext = nullptr;
+        pipelineLayoutCreateInfo.flags = 0;
 
-        if (vkCreatePipelineLayout(m_Device.GetVkDevice(), &createInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(m_Device.GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
             throw std::runtime_error("Failed to create pipeline layout!");
 
         VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo {};
@@ -111,8 +124,8 @@ namespace VulkanApi
         graphicsPipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
         graphicsPipelineCreateInfo.pMultisampleState = &multisampleStateCreateInfo;
         graphicsPipelineCreateInfo.pColorBlendState = &colorBlendStateCreateInfo;
-        graphicsPipelineCreateInfo.pDepthStencilState = &depthStencilStateCreateInfo;
-        graphicsPipelineCreateInfo.pDynamicState = &dynamicStateCreateInfo;
+        graphicsPipelineCreateInfo.pDepthStencilState = nullptr;
+        graphicsPipelineCreateInfo.pDynamicState = nullptr;
         graphicsPipelineCreateInfo.layout = m_PipelineLayout;
         graphicsPipelineCreateInfo.renderPass = m_RenderPass.GetVkRenderPass();
         graphicsPipelineCreateInfo.subpass = 0;

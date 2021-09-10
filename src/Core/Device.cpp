@@ -60,7 +60,7 @@ namespace VulkanApi
                 indices.graphicsFamily = i;
 
             VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, m_Surface.GetVkSurface(), &presentSupport);
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface.GetVkSurface(), &presentSupport);
 
             if (presentSupport)
                 indices.presentFamily = i;
@@ -92,11 +92,12 @@ namespace VulkanApi
         float queuePriority = 1.0f;
         for (uint32_t queueFamily : uniqueQueueFamilies)
         {
-            auto createInfo = queueCreateInfos.emplace_back();
+            VkDeviceQueueCreateInfo createInfo {};
             createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
             createInfo.queueFamilyIndex = queueFamily;
             createInfo.queueCount = 1;
             createInfo.pQueuePriorities = &queuePriority;
+            queueCreateInfos.push_back(createInfo);
         }
 
         VkPhysicalDeviceFeatures deviceFeatures {};

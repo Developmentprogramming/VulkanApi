@@ -1,7 +1,16 @@
+#include "Application.h"
+
+class SandboxApp : public VulkanApi::Application
+{
+public:
+
+};
+
 int main()
 {
-    // Working on Vulkan first
-    // Base code is not ready yet
+    auto* app = new SandboxApp();
+    app->Run();
+    delete app;
 
     return 0;
 }

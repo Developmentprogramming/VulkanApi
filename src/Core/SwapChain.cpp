@@ -83,7 +83,7 @@ namespace VulkanApi
             imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
             imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(m_Device.GetVkDevice(), &imageViewCreateInfo, nullptr, &m_ImageViews[0]) != VK_SUCCESS)
+            if (vkCreateImageView(m_Device.GetVkDevice(), &imageViewCreateInfo, nullptr, &m_ImageViews[i]) != VK_SUCCESS)
                 throw std::runtime_error("Failed to create image view!");
         }
     }

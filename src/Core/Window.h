@@ -17,6 +17,8 @@ namespace VulkanApi
         Window(uint32_t width, uint32_t height, const std::string& title = "VulkanApi");
         virtual ~Window();
 
+        bool Closed();
+
         inline uint32_t GetWidth() const { return m_Width; }
         inline uint32_t GetHeight() const { return m_Height; }
         inline const std::string& GetTitle() const { return m_Title; }

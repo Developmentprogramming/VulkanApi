@@ -9,25 +9,20 @@
 
 namespace VulkanApi
 {
-    enum class ShaderType
-    {
-        Vertex = VK_SHADER_STAGE_VERTEX_BIT,
-        Fragment = VK_SHADER_STAGE_FRAGMENT_BIT
-    };
-
     class ShaderModule
     {
     public:
-        ShaderModule(Device& device, ShaderType type, const char* code);
+        ShaderModule(Device& device, VkShaderStageFlagBits type, std::string code);
         virtual ~ShaderModule();
 
-        VkPipelineShaderStageCreateInfo GetShaderStageCreateInfo(const std::string& entryName = "main") const;
+        VkPipelineShaderStageCreateInfo GetShaderStageCreateInfo() const;
 
         inline VkShaderModule& GetVkShaderModule() { return m_ShaderModule; }
 
     private:
         Device& m_Device;
-        ShaderType m_Type;
+        VkShaderStageFlagBits m_Type;
+        std::string m_Code;
 
         VkShaderModule m_ShaderModule;
     };

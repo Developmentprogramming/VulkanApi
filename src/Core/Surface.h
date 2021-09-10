@@ -14,6 +14,7 @@ namespace VulkanApi
     {
     public:
         Surface(Window& window, Instance& instance);
+        virtual ~Surface();
 
         inline Window& GetWindow() { return m_Window; }
         inline Instance& GetInstance() { return m_Instance; }

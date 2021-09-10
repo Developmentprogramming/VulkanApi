@@ -40,14 +40,14 @@ namespace VulkanApi
     {
     public:
         Pipeline(Device& device, RenderPass& renderPass, Shader& shader,
-                 VkPipelineVertexInputStateCreateInfo& vertexInputStateCreateInfo,
-                 VkPipelineInputAssemblyStateCreateInfo& inputAssemblyStateCreateInfo,
-                 VkPipelineViewportStateCreateInfo& viewportStateCreateInfo,
-                 VkPipelineRasterizationStateCreateInfo& rasterizationStateCreateInfo,
-                 VkPipelineMultisampleStateCreateInfo& multisampleStateCreateInfo,
-                 VkPipelineColorBlendStateCreateInfo& colorBlendStateCreateInfo,
-                 VkPipelineDepthStencilStateCreateInfo& depthStencilStateCreateInfo,
-                 VkPipelineDynamicStateCreateInfo& dynamicStateCreateInfo);
+                 VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo,
+                 VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo,
+                 VkPipelineViewportStateCreateInfo viewportStateCreateInfo,
+                 VkPipelineRasterizationStateCreateInfo rasterizationStateCreateInfo,
+                 VkPipelineMultisampleStateCreateInfo multisampleStateCreateInfo,
+                 VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo,
+                 VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo,
+                 VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo);
 
         inline VkPipelineLayout& GetVkPipelineLayout() { return m_PipelineLayout; }
         inline VkPipeline& GetVkPipeline() { return m_Pipeline; }

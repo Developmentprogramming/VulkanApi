@@ -34,4 +34,9 @@ namespace VulkanApi
         glfwDestroyWindow(m_Window);
         glfwTerminate();
     }
+
+    bool Window::Closed()
+    {
+        return glfwWindowShouldClose(m_Window);
+    }
 }

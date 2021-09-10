@@ -18,4 +18,9 @@ namespace VulkanApi
         if (glfwCreateWindowSurface(m_Instance.GetVkInstance(), m_Window.GetWindow(), nullptr, &m_Surface) != VK_SUCCESS)
             throw std::runtime_error("Failed to create surface!");
     }
+
+    Surface::~Surface()
+    {
+        vkDestroySurfaceKHR(m_Instance.GetVkInstance(), m_Surface, nullptr);
+    }
 }
