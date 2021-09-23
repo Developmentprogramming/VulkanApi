@@ -14,16 +14,19 @@ namespace VulkanApi
     class Window
     {
     public:
-        Window(uint32_t width, uint32_t height, const std::string& title = "VulkanApi");
         virtual ~Window();
 
         bool Closed();
+        virtual void OnWindowResized(int width, int height) = 0;
 
         inline uint32_t GetWidth() const { return m_Width; }
         inline uint32_t GetHeight() const { return m_Height; }
         inline const std::string& GetTitle() const { return m_Title; }
 
         inline GLFWwindow* GetWindow() { return m_Window; }
+
+    protected:
+        Window(uint32_t width, uint32_t height, const std::string& title = "VulkanApi");
 
     private:
         GLFWwindow* m_Window;

@@ -58,7 +58,7 @@ namespace VulkanApi
 
         inline VkDevice& GetVkDevice() { return m_Device; }
 
-        Ref<Queue> GetQueue(uint32_t queueFamilyIndex, uint32_t queueFamily);
+        inline void WaitIdle() const { vkDeviceWaitIdle(m_Device); }
 
     private:
         Ref<PhysicalDevice> m_PhysicalDevice;

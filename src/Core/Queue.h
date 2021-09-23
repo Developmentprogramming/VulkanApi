@@ -14,6 +14,7 @@ namespace VulkanApi
     public:
         Queue() = default;
         inline void GetDeviceQueue(const Ref<Device>& device, uint32_t queueFamilyIndex, uint32_t queueIndex = 0) { vkGetDeviceQueue(device->GetVkDevice(), queueFamilyIndex, queueIndex, &m_Queue); };
+        inline void WaitIdle() const { vkQueueWaitIdle(m_Queue); }
 
         inline VkQueue& GetVkQueue() { return m_Queue; }
 

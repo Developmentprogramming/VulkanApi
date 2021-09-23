@@ -15,6 +15,7 @@
 #include "Core/CommandPool.h"
 #include "Core/CommandBuffers.h"
 #include "Core/Semaphore.h"
+#include "Core/Fence.h"
 
 namespace VulkanApi
 {
@@ -22,10 +23,15 @@ namespace VulkanApi
     {
     public:
         Application();
-        virtual ~Application();
+        virtual ~Application() = default;
+
+        void CreateSwapChain();
+        void RecreateSwapChain();
 
         void Run();
         void DrawFrame();
+
+        void OnWindowResized(int width, int height) override;
 
     private:
         Ref<Instance> m_Instance;
@@ -39,7 +45,11 @@ namespace VulkanApi
         Ref<Pipeline> m_GraphicsPipeline;
         Ref<CommandPool> m_CommandPool;
         Ref<CommandBuffers> m_CommandBuffers;
-        Ref<Semaphore> m_ImageAvailableSemaphore, m_RenderFinishedSemaphore;
+        std::vector<Semaphore> m_ImageAvailableSemaphore, m_RenderFinishedSemaphore;
+        std::vector<Fence> m_InFlightFences, m_ImagesInFlight;
+
+        bool m_FrameBufferResized = false;
+        uint32_t m_CurrentFrame = 0;
     };
 }
 
