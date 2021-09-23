@@ -18,28 +18,21 @@ namespace VulkanApi
     class GraphicsPipeline // Graphics Pipeline is a SingleTon
     {
     public:
-        GraphicsPipeline(const GraphicsPipeline&) = delete;
-        GraphicsPipeline(GraphicsPipeline&&) = delete;
-        GraphicsPipeline& operator=(GraphicsPipeline&) = delete;
-        GraphicsPipeline& operator=(GraphicsPipeline&&) = delete;
-
-        inline static GraphicsPipeline& Get() { static GraphicsPipeline instance; return instance; }
-
-        VkPipelineVertexInputStateCreateInfo GetVertexInputStateCreateInfo();
-        VkPipelineInputAssemblyStateCreateInfo GetInputAssemblyCreateInfo();
-        VkPipelineViewportStateCreateInfo GetViewportStateCreateInfo(const std::vector<VkViewport>& viewports, const std::vector<VkRect2D>& scissors);
-        VkPipelineRasterizationStateCreateInfo GetRasterizationStateCreateInfo();
-        VkPipelineMultisampleStateCreateInfo GetMultisampleStateCreateInfo();
-        VkPipelineColorBlendStateCreateInfo GetColorBlendStateCreateInfo(const std::vector<VkPipelineColorBlendAttachmentState>& colorAttachments);
+        static VkPipelineVertexInputStateCreateInfo GetVertexInputStateCreateInfo();
+        static VkPipelineInputAssemblyStateCreateInfo GetInputAssemblyCreateInfo();
+        static VkPipelineViewportStateCreateInfo GetViewportStateCreateInfo(const std::vector<VkViewport>& viewports, const std::vector<VkRect2D>& scissors);
+        static VkPipelineRasterizationStateCreateInfo GetRasterizationStateCreateInfo();
+        static VkPipelineMultisampleStateCreateInfo GetMultisampleStateCreateInfo();
+        static VkPipelineColorBlendStateCreateInfo GetColorBlendStateCreateInfo(const std::vector<VkPipelineColorBlendAttachmentState>& colorAttachments);
 
     private:
-        GraphicsPipeline();
+        GraphicsPipeline() = default;
     };
 
     class Pipeline
     {
     public:
-        Pipeline(Device& device, RenderPass& renderPass, Shader& shader,
+        Pipeline(const Ref<Device>& device, const Ref<RenderPass>& renderPass, const Ref<Shader>& shader,
                  VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo,
                  VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo,
                  VkPipelineViewportStateCreateInfo viewportStateCreateInfo,
@@ -48,14 +41,15 @@ namespace VulkanApi
                  VkPipelineColorBlendStateCreateInfo colorBlendStateCreateInfo,
                  VkPipelineDepthStencilStateCreateInfo depthStencilStateCreateInfo,
                  VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo);
+        virtual ~Pipeline();
 
         inline VkPipelineLayout& GetVkPipelineLayout() { return m_PipelineLayout; }
         inline VkPipeline& GetVkPipeline() { return m_Pipeline; }
 
     private:
-        Device& m_Device;
-        RenderPass& m_RenderPass;
-        Shader& m_Shader;
+        Ref<Device> m_Device;
+        Ref<RenderPass> m_RenderPass;
+        Ref<Shader> m_Shader;
 
         VkPipelineLayout m_PipelineLayout;
         VkPipeline m_Pipeline;

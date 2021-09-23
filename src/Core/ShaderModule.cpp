@@ -11,7 +11,7 @@
 namespace VulkanApi
 {
 
-    ShaderModule::ShaderModule(Device &device, VkShaderStageFlagBits type, std::string code)
+    ShaderModule::ShaderModule(const Ref<Device>& device, VkShaderStageFlagBits type, std::string code)
         : m_Device(device), m_Type(type), m_Code(std::move(code))
     {
         VkShaderModuleCreateInfo shaderCreateInfo {};
@@ -19,13 +19,20 @@ namespace VulkanApi
         shaderCreateInfo.codeSize = (uint32_t)m_Code.size();
         shaderCreateInfo.pCode = reinterpret_cast<const uint32_t*>(m_Code.data());
 
-        if (vkCreateShaderModule(m_Device.GetVkDevice(), &shaderCreateInfo, nullptr, &m_ShaderModule) != VK_SUCCESS)
+        if (vkCreateShaderModule(m_Device->GetVkDevice(), &shaderCreateInfo, nullptr, &m_ShaderModule) != VK_SUCCESS)
             throw std::runtime_error("Failed to create shader module!");
     }
 
     ShaderModule::~ShaderModule()
     {
-//        vkDestroyShaderModule(m_Device.GetVkDevice(), m_ShaderModule, nullptr);
+        if (!m_Destroyed)
+            Destroy();
+    }
+
+    void ShaderModule::Destroy()
+    {
+        vkDestroyShaderModule(m_Device->GetVkDevice(), m_ShaderModule, nullptr);
+        m_Destroyed = true;
     }
 
     VkPipelineShaderStageCreateInfo ShaderModule::GetShaderStageCreateInfo() const
@@ -44,14 +51,16 @@ namespace VulkanApi
     // Shader ==============================================================================
     // =====================================================================================
 
-    Shader::Shader(Device &device, const std::string &vertPath, const std::string &fragPath)
+    Shader::Shader(const Ref<Device>& device, const std::string &vertPath, const std::string &fragPath)
         : m_Device(device)
     {
+        m_ShaderModules.reserve(2);
+
         auto vertCode = ReadFile(vertPath);
         auto fragCode = ReadFile(fragPath);
 
-        m_ShaderModules.emplace_back(device, VK_SHADER_STAGE_VERTEX_BIT, vertCode);
-        m_ShaderModules.emplace_back(device, VK_SHADER_STAGE_FRAGMENT_BIT, fragCode);
+        m_ShaderModules.emplace_back(m_Device, VK_SHADER_STAGE_VERTEX_BIT, vertCode);
+        m_ShaderModules.emplace_back(m_Device, VK_SHADER_STAGE_FRAGMENT_BIT, fragCode);
     }
 
     std::vector<VkPipelineShaderStageCreateInfo> Shader::GetVkShaderModules()

@@ -8,11 +8,11 @@
 namespace VulkanApi
 {
 
-    RenderPass::RenderPass(Device &device, SwapChain& swapChain)
+    RenderPass::RenderPass(const Ref<Device>& device, const Ref<SwapChain>& swapChain)
         : m_Device(device), m_SwapChain(swapChain)
     {
         VkAttachmentDescription colorAttachment {};
-        colorAttachment.format = m_SwapChain.GetVkFormat();
+        colorAttachment.format = m_SwapChain->GetVkFormat();
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -47,7 +47,12 @@ namespace VulkanApi
         renderPassCreateInfo.dependencyCount = 1;
         renderPassCreateInfo.pDependencies = &dependency;
 
-        if (vkCreateRenderPass(m_Device.GetVkDevice(), &renderPassCreateInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
+        if (vkCreateRenderPass(m_Device->GetVkDevice(), &renderPassCreateInfo, nullptr, &m_RenderPass) != VK_SUCCESS)
             throw std::runtime_error("Failed to create render pass");
+    }
+
+    RenderPass::~RenderPass()
+    {
+        vkDestroyRenderPass(m_Device->GetVkDevice(), m_RenderPass, nullptr);
     }
 }

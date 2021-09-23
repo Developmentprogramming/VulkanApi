@@ -8,10 +8,6 @@
 namespace VulkanApi
 {
 
-    GraphicsPipeline::GraphicsPipeline()
-    {
-    }
-
     VkPipelineVertexInputStateCreateInfo GraphicsPipeline::GetVertexInputStateCreateInfo()
     {
         VkPipelineVertexInputStateCreateInfo createInfo {};
@@ -89,8 +85,7 @@ namespace VulkanApi
     // Pipeline Layout ================================================
     // ================================================================
 
-
-    Pipeline::Pipeline(Device &device, RenderPass &renderPass, Shader &shader,
+    Pipeline::Pipeline(const Ref<Device>& device, const Ref<RenderPass>& renderPass, const Ref<Shader>& shader,
                        VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo,
                        VkPipelineInputAssemblyStateCreateInfo inputAssemblyStateCreateInfo,
                        VkPipelineViewportStateCreateInfo viewportStateCreateInfo,
@@ -110,12 +105,12 @@ namespace VulkanApi
         pipelineLayoutCreateInfo.pNext = nullptr;
         pipelineLayoutCreateInfo.flags = 0;
 
-        if (vkCreatePipelineLayout(m_Device.GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
+        if (vkCreatePipelineLayout(m_Device->GetVkDevice(), &pipelineLayoutCreateInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
             throw std::runtime_error("Failed to create pipeline layout!");
 
         VkGraphicsPipelineCreateInfo graphicsPipelineCreateInfo {};
         graphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        auto shaderStages = m_Shader.GetVkShaderModules();
+        auto shaderStages = m_Shader->GetVkShaderModules();
         graphicsPipelineCreateInfo.stageCount = (uint32_t)shaderStages.size();
         graphicsPipelineCreateInfo.pStages = shaderStages.data();
         graphicsPipelineCreateInfo.pVertexInputState = &vertexInputStateCreateInfo;
@@ -127,12 +122,18 @@ namespace VulkanApi
         graphicsPipelineCreateInfo.pDepthStencilState = nullptr;
         graphicsPipelineCreateInfo.pDynamicState = nullptr;
         graphicsPipelineCreateInfo.layout = m_PipelineLayout;
-        graphicsPipelineCreateInfo.renderPass = m_RenderPass.GetVkRenderPass();
+        graphicsPipelineCreateInfo.renderPass = m_RenderPass->GetVkRenderPass();
         graphicsPipelineCreateInfo.subpass = 0;
         graphicsPipelineCreateInfo.basePipelineHandle = VK_NULL_HANDLE;
         graphicsPipelineCreateInfo.basePipelineIndex = -1;
 
-        if (vkCreateGraphicsPipelines(m_Device.GetVkDevice(), VK_NULL_HANDLE, (uint32_t)1, &graphicsPipelineCreateInfo, nullptr, &m_Pipeline) != VK_SUCCESS)
+        if (vkCreateGraphicsPipelines(m_Device->GetVkDevice(), VK_NULL_HANDLE, (uint32_t)1, &graphicsPipelineCreateInfo, nullptr, &m_Pipeline) != VK_SUCCESS)
             throw std::runtime_error("Failed to create graphics pipeline!");
+    }
+
+    Pipeline::~Pipeline()
+    {
+        vkDestroyPipeline(m_Device->GetVkDevice(), m_Pipeline, nullptr);
+        vkDestroyPipelineLayout(m_Device->GetVkDevice(), m_PipelineLayout, nullptr);
     }
 }

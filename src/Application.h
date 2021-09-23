@@ -22,7 +22,7 @@ namespace VulkanApi
     {
     public:
         Application();
-        virtual ~Application() = default;
+        virtual ~Application();
 
         void Run();
         void DrawFrame();
@@ -32,16 +32,14 @@ namespace VulkanApi
         Ref<Surface> m_Surface;
         Ref<PhysicalDevice> m_PhysicalDevice;
         Ref<Device> m_Device;
-        Ref<Queue> m_GraphicsQueue;
-        Ref<Queue> m_PresentQueue;
+        Ref<Queue> m_GraphicsQueue, m_PresentQueue;
         Ref<SwapChain> m_SwapChain;
         Ref<RenderPass> m_RenderPass;
         Ref<Shader> m_Shader;
         Ref<Pipeline> m_GraphicsPipeline;
         Ref<CommandPool> m_CommandPool;
         Ref<CommandBuffers> m_CommandBuffers;
-        Ref<Semaphore> m_ImageAvailableSemaphore;
-        Ref<Semaphore> m_RenderFinishedSemaphore;
+        Ref<Semaphore> m_ImageAvailableSemaphore, m_RenderFinishedSemaphore;
     };
 }
 

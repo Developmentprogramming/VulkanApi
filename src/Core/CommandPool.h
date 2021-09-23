@@ -12,13 +12,14 @@ namespace VulkanApi
     class CommandPool
     {
     public:
-        CommandPool(Device& device);
+        CommandPool(const Ref<Device>& device);
+        virtual ~CommandPool();
 
         inline VkCommandPool& GetVkCommandPool() { return m_CommandPool; }
-        inline Device& GetDevice() { return m_Device; }
+        inline Ref<Device> GetDevice() { return m_Device; }
 
     private:
-        Device& m_Device;
+        Ref<Device> m_Device;
 
         VkCommandPool m_CommandPool;
     };

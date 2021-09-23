@@ -12,12 +12,13 @@ namespace VulkanApi
     class Semaphore
     {
     public:
-        Semaphore(Device& device);
+        Semaphore(const Ref<Device>& device);
+        virtual ~Semaphore();
 
         inline VkSemaphore& GetVkSemaphore() { return m_Semaphore; }
 
     private:
-        Device& m_Device;
+        Ref<Device> m_Device;
 
         VkSemaphore m_Semaphore;
     };

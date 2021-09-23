@@ -9,17 +9,22 @@
 namespace VulkanApi
 {
 
-    CommandBuffers::CommandBuffers(CommandPool &commandPool, SwapChain &swapChain, RenderPass &renderPass, Pipeline& pipeline)
+    CommandBuffers::CommandBuffers(const Ref<CommandPool>& commandPool, const Ref<SwapChain>& swapChain, const Ref<RenderPass>& renderPass, const Ref<Pipeline>& pipeline)
         : m_CommandPool(commandPool), m_SwapChain(swapChain), m_RenderPass(renderPass), m_Pipeline(pipeline),
-        m_CommandBuffers(swapChain.GetFrameBuffers().size())
+        m_CommandBuffers(swapChain->GetFrameBuffers().size())
     {
         VkCommandBufferAllocateInfo allocateInfo {};
         allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocateInfo.commandPool = m_CommandPool.GetVkCommandPool();
+        allocateInfo.commandPool = m_CommandPool->GetVkCommandPool();
         allocateInfo.commandBufferCount = (uint32_t)m_CommandBuffers.size();
 
-        if (vkAllocateCommandBuffers(m_CommandPool.GetDevice().GetVkDevice(), &allocateInfo, m_CommandBuffers.data()) != VK_SUCCESS)
+        if (vkAllocateCommandBuffers(m_CommandPool->GetDevice()->GetVkDevice(), &allocateInfo, m_CommandBuffers.data()) != VK_SUCCESS)
             throw std::runtime_error("Failed to allocate command buffers!");
+    }
+
+    CommandBuffers::~CommandBuffers()
+    {
+        vkFreeCommandBuffers(m_CommandPool->GetDevice()->GetVkDevice(), m_CommandPool->GetVkCommandPool(), (uint32_t)m_CommandBuffers.size(), m_CommandBuffers.data());
     }
 
     void CommandBuffers::Begin() const
@@ -36,10 +41,10 @@ namespace VulkanApi
 
             VkRenderPassBeginInfo renderPassBeginInfo {};
             renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassBeginInfo.renderPass = m_RenderPass.GetVkRenderPass();
-            renderPassBeginInfo.framebuffer = m_SwapChain.GetFrameBuffers()[i];
+            renderPassBeginInfo.renderPass = m_RenderPass->GetVkRenderPass();
+            renderPassBeginInfo.framebuffer = m_SwapChain->GetFrameBuffers()[i];
             renderPassBeginInfo.renderArea.offset = { 0, 0 };
-            renderPassBeginInfo.renderArea.extent = m_SwapChain.GetVkExtent();
+            renderPassBeginInfo.renderArea.extent = m_SwapChain->GetVkExtent();
 
             VkClearValue colorValue = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
             renderPassBeginInfo.clearValueCount = 1;
@@ -47,7 +52,7 @@ namespace VulkanApi
 
             vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-            vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline.GetVkPipeline());
+            vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->GetVkPipeline());
             vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);

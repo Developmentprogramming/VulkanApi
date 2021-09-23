@@ -12,15 +12,15 @@
 namespace VulkanApi
 {
 
-    Surface::Surface(Window& window, Instance& instance)
+    Surface::Surface(Window& window, const Ref<Instance>& instance)
         : m_Window(window), m_Instance(instance)
     {
-        if (glfwCreateWindowSurface(m_Instance.GetVkInstance(), m_Window.GetWindow(), nullptr, &m_Surface) != VK_SUCCESS)
+        if (glfwCreateWindowSurface(m_Instance->GetVkInstance(), m_Window.GetWindow(), nullptr, &m_Surface) != VK_SUCCESS)
             throw std::runtime_error("Failed to create surface!");
     }
 
     Surface::~Surface()
     {
-        vkDestroySurfaceKHR(m_Instance.GetVkInstance(), m_Surface, nullptr);
+        vkDestroySurfaceKHR(m_Instance->GetVkInstance(), m_Surface, nullptr);
     }
 }

@@ -16,20 +16,23 @@ namespace VulkanApi
     Application::Application()
         : Window(800, 600),
         m_Instance(CreateRef<Instance, const std::initializer_list<const char*>&>({ "VK_LAYER_KHRONOS_validation" })),
-        m_Surface(CreateRef<Surface>(*this, *m_Instance)),
-        m_PhysicalDevice(CreateRef<PhysicalDevice>(*m_Instance, *m_Surface))
+        m_Surface(CreateRef<Surface>(*this, m_Instance)),
+        m_PhysicalDevice(CreateRef<PhysicalDevice>(m_Instance, m_Surface))
     {
         m_PhysicalDevice->PickSuitableDevice();
 
-        m_Device = CreateRef<Device, const std::initializer_list<const char*>&, PhysicalDevice&>({ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, *m_PhysicalDevice);
+        m_Device = CreateRef<Device, const std::initializer_list<const char*>&, const Ref<PhysicalDevice>&>({ VK_KHR_SWAPCHAIN_EXTENSION_NAME }, m_PhysicalDevice);
         auto indices = m_PhysicalDevice->GetQueueFamilyProperties();
-        m_GraphicsQueue = CreateRef<Queue>(m_Device->GetQueue(indices.graphicsFamily.value(), 0));
-        m_PresentQueue = CreateRef<Queue>(m_Device->GetQueue(indices.presentFamily.value(), 0));
 
-        m_SwapChain = CreateRef<SwapChain>(*this, *m_Device, *m_Surface);
-        m_RenderPass = CreateRef<RenderPass>(*m_Device, *m_SwapChain);
+        m_GraphicsQueue = CreateRef<Queue>();
+        m_GraphicsQueue->GetDeviceQueue(m_Device, indices.graphicsFamily.value());
+        m_PresentQueue = CreateRef<Queue>();
+        m_PresentQueue->GetDeviceQueue(m_Device, indices.presentFamily.value());
 
-        m_Shader = CreateRef<Shader>(*m_Device, "assets/shaders-spv/shader.vert.spv", "assets/shaders-spv/shader.frag.spv");
+        m_SwapChain = CreateRef<SwapChain>(*this, m_Device, m_Surface);
+        m_RenderPass = CreateRef<RenderPass>(m_Device, m_SwapChain);
+
+        m_Shader = CreateRef<Shader>(m_Device, "assets/shaders-spv/shader.vert.spv", "assets/shaders-spv/shader.frag.spv");
 
         VkViewport viewport;
         auto& extent = m_SwapChain->GetVkExtent();
@@ -54,23 +57,30 @@ namespace VulkanApi
         VkPipelineDynamicStateCreateInfo dynamicStateCreateInfo {};
         dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 
-        auto& pipelineS = GraphicsPipeline::Get();
-        m_GraphicsPipeline = CreateRef<Pipeline>(*m_Device, *m_RenderPass, *m_Shader,
-                                                 pipelineS.GetVertexInputStateCreateInfo(),
-                                                 pipelineS.GetInputAssemblyCreateInfo(),
-                                                 pipelineS.GetViewportStateCreateInfo({ viewport }, { scissor }),
-                                                 pipelineS.GetRasterizationStateCreateInfo(),
-                                                 pipelineS.GetMultisampleStateCreateInfo(),
-                                                 pipelineS.GetColorBlendStateCreateInfo({ colorAttachment }),
+        m_GraphicsPipeline = CreateRef<Pipeline>(m_Device, m_RenderPass, m_Shader,
+                                                 GraphicsPipeline::GetVertexInputStateCreateInfo(),
+                                                 GraphicsPipeline::GetInputAssemblyCreateInfo(),
+                                                 GraphicsPipeline::GetViewportStateCreateInfo({ viewport }, { scissor }),
+                                                 GraphicsPipeline::GetRasterizationStateCreateInfo(),
+                                                 GraphicsPipeline::GetMultisampleStateCreateInfo(),
+                                                 GraphicsPipeline::GetColorBlendStateCreateInfo({ colorAttachment }),
                                                  depthStencilStateCreateInfo,
                                                  dynamicStateCreateInfo);
         m_SwapChain->CreateFrameBuffers(*m_RenderPass);
-        m_CommandPool = CreateRef<CommandPool>(*m_Device);
-        m_CommandBuffers = CreateRef<CommandBuffers>(*m_CommandPool, *m_SwapChain, *m_RenderPass, *m_GraphicsPipeline);
+        m_CommandPool = CreateRef<CommandPool>(m_Device);
+        m_CommandBuffers = CreateRef<CommandBuffers>(m_CommandPool, m_SwapChain, m_RenderPass, m_GraphicsPipeline);
         m_CommandBuffers->Begin();
 
-        m_ImageAvailableSemaphore = CreateRef<Semaphore>(*m_Device);
-        m_RenderFinishedSemaphore = CreateRef<Semaphore>(*m_Device);
+        m_ImageAvailableSemaphore = CreateRef<Semaphore>(m_Device);
+        m_RenderFinishedSemaphore = CreateRef<Semaphore>(m_Device);
+
+        // Destroy shader modules
+        m_Shader->ReleaseModules();
+    }
+
+    Application::~Application()
+    {
+
     }
 
     void Application::Run()

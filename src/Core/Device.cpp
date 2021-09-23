@@ -11,15 +11,15 @@
 namespace VulkanApi
 {
 
-    PhysicalDevice::PhysicalDevice(Instance &instance, Surface& surface)
+    PhysicalDevice::PhysicalDevice(const Ref<Instance>& instance, const Ref<Surface>& surface)
         : m_Instance(instance), m_Surface(surface), m_PhysicalDevice(VK_NULL_HANDLE)
     {
-        vkEnumeratePhysicalDevices(m_Instance.GetVkInstance(), &m_DeviceCount, nullptr);
+        vkEnumeratePhysicalDevices(m_Instance->GetVkInstance(), &m_DeviceCount, nullptr);
         if (m_DeviceCount == 0)
             throw std::runtime_error("GPU with Vulkan support not found");
 
         m_Devices.resize(m_DeviceCount);
-        vkEnumeratePhysicalDevices(m_Instance.GetVkInstance(), &m_DeviceCount, m_Devices.data());
+        vkEnumeratePhysicalDevices(m_Instance->GetVkInstance(), &m_DeviceCount, m_Devices.data());
     }
 
     void PhysicalDevice::PickSuitableDevice()
@@ -60,7 +60,7 @@ namespace VulkanApi
                 indices.graphicsFamily = i;
 
             VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface.GetVkSurface(), &presentSupport);
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface->GetVkSurface(), &presentSupport);
 
             if (presentSupport)
                 indices.presentFamily = i;
@@ -81,10 +81,10 @@ namespace VulkanApi
     // Logical Device ===================================================================
     // ==================================================================================
 
-    Device::Device(const std::initializer_list<const char*>& deviceExtensions, PhysicalDevice &device)
+    Device::Device(const std::initializer_list<const char*>& deviceExtensions, const Ref<PhysicalDevice>& device)
         : m_DeviceExtensions(deviceExtensions), m_PhysicalDevice(device)
     {
-        PhysicalDevice::QueueFamilyDetails indices = m_PhysicalDevice.GetQueueFamilyProperties();
+        PhysicalDevice::QueueFamilyDetails indices = m_PhysicalDevice->GetQueueFamilyProperties();
 
         std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
         std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -110,21 +110,21 @@ namespace VulkanApi
         deviceCreateInfo.enabledExtensionCount = (uint32_t)m_DeviceExtensions.size();
         deviceCreateInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
 
-        if (m_PhysicalDevice.GetInstance().GetValidationLayersEnabled())
+        if (m_PhysicalDevice->GetInstance()->GetValidationLayersEnabled())
         {
-            auto& validationLayers = m_PhysicalDevice.GetInstance().GetValidationLayers();
+            auto& validationLayers = m_PhysicalDevice->GetInstance()->GetValidationLayers();
             deviceCreateInfo.enabledLayerCount = (uint32_t)validationLayers.size();
             deviceCreateInfo.ppEnabledLayerNames = validationLayers.data();
         }
         else
             deviceCreateInfo.enabledLayerCount = 0;
 
-        if (vkCreateDevice(m_PhysicalDevice.GetVkPhysicalDevice(), &deviceCreateInfo, nullptr, &m_Device) != VK_SUCCESS)
+        if (vkCreateDevice(m_PhysicalDevice->GetVkPhysicalDevice(), &deviceCreateInfo, nullptr, &m_Device) != VK_SUCCESS)
             throw std::runtime_error("Failed to create logical device!");
     }
 
-    Queue Device::GetQueue(uint32_t queueFamilyIndex, uint32_t queueIndex)
+    Device::~Device()
     {
-        return Queue(*this, queueFamilyIndex, queueIndex);
+        vkDestroyDevice(m_Device, nullptr);
     }
 }

@@ -12,13 +12,12 @@ namespace VulkanApi
     class Queue
     {
     public:
-        Queue(Device& device, uint32_t queueFamilyIndex, uint32_t queueIndex = 0);
+        Queue() = default;
+        inline void GetDeviceQueue(const Ref<Device>& device, uint32_t queueFamilyIndex, uint32_t queueIndex = 0) { vkGetDeviceQueue(device->GetVkDevice(), queueFamilyIndex, queueIndex, &m_Queue); };
 
-        inline Device& GetDevice() { return m_Device; }
         inline VkQueue& GetVkQueue() { return m_Queue; }
 
     private:
-        Device& m_Device;
         VkQueue m_Queue;
     };
 }

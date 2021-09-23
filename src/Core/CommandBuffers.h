@@ -15,17 +15,18 @@ namespace VulkanApi
     class CommandBuffers
     {
     public:
-        CommandBuffers(CommandPool& commandPool, SwapChain& swapChain, RenderPass& renderPass, Pipeline& pipeline);
+        CommandBuffers(const Ref<CommandPool>& commandPool, const Ref<SwapChain>& swapChain, const Ref<RenderPass>& renderPass, const Ref<Pipeline>& pipeline);
+        virtual ~CommandBuffers();
 
         void Begin() const;
 
         inline std::vector<VkCommandBuffer>& GetCommandBuffers() { return m_CommandBuffers; }
 
     private:
-        CommandPool& m_CommandPool;
-        SwapChain& m_SwapChain;
-        RenderPass& m_RenderPass;
-        Pipeline& m_Pipeline;
+        Ref<CommandPool> m_CommandPool;
+        Ref<SwapChain> m_SwapChain;
+        Ref<RenderPass> m_RenderPass;
+        Ref<Pipeline> m_Pipeline;
 
         std::vector<VkCommandBuffer> m_CommandBuffers;
     };

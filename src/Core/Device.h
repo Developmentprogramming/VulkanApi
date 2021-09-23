@@ -24,7 +24,7 @@ namespace VulkanApi
         };
 
     public:
-        PhysicalDevice(Instance& instance, Surface& surface);
+        PhysicalDevice(const Ref<Instance>& instance, const Ref<Surface>& surface);
         void PickSuitableDevice();
 
         QueueFamilyDetails GetQueueFamilyProperties(VkPhysicalDevice device);
@@ -32,14 +32,14 @@ namespace VulkanApi
 
         inline VkPhysicalDevice& GetVkPhysicalDevice() { return m_PhysicalDevice; }
 
-        inline Instance& GetInstance() { return m_Instance; }
+        inline Ref<Instance> GetInstance() { return m_Instance; }
 
     private:
         bool IsDeviceSuitable(VkPhysicalDevice device);
 
     private:
-        Instance& m_Instance;
-        Surface& m_Surface;
+        Ref<Instance> m_Instance;
+        Ref<Surface> m_Surface;
 
         VkPhysicalDevice m_PhysicalDevice;
         uint32_t m_DeviceCount;
@@ -51,16 +51,17 @@ namespace VulkanApi
     class Device
     {
     public:
-        Device(const std::initializer_list<const char*>& deviceExtensions, PhysicalDevice& device);
+        Device(const std::initializer_list<const char*>& deviceExtensions, const Ref<PhysicalDevice>& device);
+        virtual ~Device();
 
-        inline PhysicalDevice& GetPhysicalDevice() { return m_PhysicalDevice; }
+        inline Ref<PhysicalDevice> GetPhysicalDevice() { return m_PhysicalDevice; }
 
         inline VkDevice& GetVkDevice() { return m_Device; }
 
-        Queue GetQueue(uint32_t queueFamilyIndex, uint32_t queueFamily);
+        Ref<Queue> GetQueue(uint32_t queueFamilyIndex, uint32_t queueFamily);
 
     private:
-        PhysicalDevice& m_PhysicalDevice;
+        Ref<PhysicalDevice> m_PhysicalDevice;
 
         VkDevice m_Device;
         std::vector<const char*> m_DeviceExtensions;

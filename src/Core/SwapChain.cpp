@@ -13,7 +13,7 @@
 namespace VulkanApi
 {
 
-    SwapChain::SwapChain(Window& window, Device &device, Surface &surface)
+    SwapChain::SwapChain(Window& window, const Ref<Device>& device, const Ref<Surface>& surface)
         : m_Window(window), m_Device(device), m_Surface(surface)
     {
         m_Details = QuerySupport();
@@ -28,7 +28,7 @@ namespace VulkanApi
 
         VkSwapchainCreateInfoKHR createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-        createInfo.surface = m_Surface.GetVkSurface();
+        createInfo.surface = m_Surface->GetVkSurface();
         createInfo.minImageCount = imageCount;
         createInfo.imageFormat = format.format;
         createInfo.imageColorSpace = format.colorSpace;
@@ -36,7 +36,7 @@ namespace VulkanApi
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        PhysicalDevice::QueueFamilyDetails indices = m_Device.GetPhysicalDevice().GetQueueFamilyProperties();
+        PhysicalDevice::QueueFamilyDetails indices = m_Device->GetPhysicalDevice()->GetQueueFamilyProperties();
         uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
         if (indices.graphicsFamily != indices.presentFamily)
@@ -54,12 +54,12 @@ namespace VulkanApi
         createInfo.clipped = VK_TRUE;
         createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-        if (vkCreateSwapchainKHR(m_Device.GetVkDevice(), &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS)
+        if (vkCreateSwapchainKHR(m_Device->GetVkDevice(), &createInfo, nullptr, &m_SwapChain) != VK_SUCCESS)
             throw std::runtime_error("Failed to create swap chain!");
 
-        vkGetSwapchainImagesKHR(m_Device.GetVkDevice(), m_SwapChain, &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(m_Device->GetVkDevice(), m_SwapChain, &imageCount, nullptr);
         m_Images.resize(imageCount);
-        vkGetSwapchainImagesKHR(m_Device.GetVkDevice(), m_SwapChain, &imageCount, m_Images.data());
+        vkGetSwapchainImagesKHR(m_Device->GetVkDevice(), m_SwapChain, &imageCount, m_Images.data());
 
         m_Format = format.format;
         m_Extent = extent;
@@ -83,9 +83,20 @@ namespace VulkanApi
             imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
             imageViewCreateInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(m_Device.GetVkDevice(), &imageViewCreateInfo, nullptr, &m_ImageViews[i]) != VK_SUCCESS)
+            if (vkCreateImageView(m_Device->GetVkDevice(), &imageViewCreateInfo, nullptr, &m_ImageViews[i]) != VK_SUCCESS)
                 throw std::runtime_error("Failed to create image view!");
         }
+    }
+
+    SwapChain::~SwapChain()
+    {
+        for (auto& framebuffer : m_FrameBuffers)
+            vkDestroyFramebuffer(m_Device->GetVkDevice(), framebuffer, nullptr);
+
+        for (auto& imageViews: m_ImageViews)
+            vkDestroyImageView(m_Device->GetVkDevice(), imageViews, nullptr);
+
+        vkDestroySwapchainKHR(m_Device->GetVkDevice(), m_SwapChain, nullptr);
     }
 
     void SwapChain::CreateFrameBuffers(RenderPass &renderPass)
@@ -105,7 +116,7 @@ namespace VulkanApi
             framebufferCreateInfo.height = m_Extent.height;
             framebufferCreateInfo.layers = 1;
 
-            if (vkCreateFramebuffer(m_Device.GetVkDevice(), &framebufferCreateInfo, nullptr, &m_FrameBuffers[i]) != VK_SUCCESS)
+            if (vkCreateFramebuffer(m_Device->GetVkDevice(), &framebufferCreateInfo, nullptr, &m_FrameBuffers[i]) != VK_SUCCESS)
                 throw std::runtime_error("Failed to create frame buffer!");
         }
     }
@@ -113,8 +124,8 @@ namespace VulkanApi
     SwapChain::SupportDetails SwapChain::QuerySupport()
     {
         SupportDetails details;
-        auto physicalDevice = m_Device.GetPhysicalDevice().GetVkPhysicalDevice();
-        auto surface = m_Surface.GetVkSurface();
+        auto physicalDevice = m_Device->GetPhysicalDevice()->GetVkPhysicalDevice();
+        auto surface = m_Surface->GetVkSurface();
 
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &details.capabilities);
 

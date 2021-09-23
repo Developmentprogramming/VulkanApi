@@ -7,23 +7,24 @@
 
 #include "Instance.h"
 #include "Window.h"
+#include "Core.h"
 
 namespace VulkanApi
 {
     class Surface
     {
     public:
-        Surface(Window& window, Instance& instance);
+        Surface(Window& window, const Ref<Instance>& instance);
         virtual ~Surface();
 
         inline Window& GetWindow() { return m_Window; }
-        inline Instance& GetInstance() { return m_Instance; }
+        inline Ref<Instance> GetInstance() { return m_Instance; }
 
         inline VkSurfaceKHR& GetVkSurface() { return m_Surface; }
 
     private:
         Window& m_Window;
-        Instance& m_Instance;
+        Ref<Instance> m_Instance;
 
         VkSurfaceKHR m_Surface;
     };

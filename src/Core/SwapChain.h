@@ -23,7 +23,8 @@ namespace VulkanApi
         };
 
     public:
-        SwapChain(Window& window, Device& device, Surface& surface);
+        SwapChain(Window& window, const Ref<Device>& device, const Ref<Surface>& surface);
+        virtual ~SwapChain();
 
         void CreateFrameBuffers(RenderPass& renderPass);
 
@@ -49,8 +50,8 @@ namespace VulkanApi
         static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, Window& window);
 
     private:
-        Device& m_Device;
-        Surface& m_Surface;
+        Ref<Device> m_Device;
+        Ref<Surface> m_Surface;
         Window& m_Window;
 
         VkSwapchainKHR m_SwapChain;

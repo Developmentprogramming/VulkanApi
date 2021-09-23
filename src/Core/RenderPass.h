@@ -13,13 +13,15 @@ namespace VulkanApi
     class RenderPass
     {
     public:
-        RenderPass(Device& device, SwapChain& swapChain);
+        RenderPass(const Ref<Device>& device, const Ref<SwapChain>& swapChain);
+        virtual ~RenderPass();
+
 
         inline VkRenderPass& GetVkRenderPass() { return m_RenderPass; }
 
     private:
-        Device& m_Device;
-        SwapChain& m_SwapChain;
+        Ref<Device> m_Device;
+        Ref<SwapChain> m_SwapChain;
 
         VkRenderPass m_RenderPass;
     };
