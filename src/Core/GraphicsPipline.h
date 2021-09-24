@@ -15,10 +15,10 @@
 
 namespace VulkanApi
 {
-    class GraphicsPipeline // Graphics Pipeline is a SingleTon
+    class GraphicsPipeline
     {
     public:
-        static VkPipelineVertexInputStateCreateInfo GetVertexInputStateCreateInfo();
+        static VkPipelineVertexInputStateCreateInfo GetVertexInputStateCreateInfo(const std::vector<VkVertexInputBindingDescription>& vertexBindings, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions);
         static VkPipelineInputAssemblyStateCreateInfo GetInputAssemblyCreateInfo();
         static VkPipelineViewportStateCreateInfo GetViewportStateCreateInfo(const std::vector<VkViewport>& viewports, const std::vector<VkRect2D>& scissors);
         static VkPipelineRasterizationStateCreateInfo GetRasterizationStateCreateInfo();

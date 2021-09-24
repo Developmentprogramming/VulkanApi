@@ -8,14 +8,14 @@
 namespace VulkanApi
 {
 
-    VkPipelineVertexInputStateCreateInfo GraphicsPipeline::GetVertexInputStateCreateInfo()
+    VkPipelineVertexInputStateCreateInfo GraphicsPipeline::GetVertexInputStateCreateInfo(const std::vector<VkVertexInputBindingDescription>& vertexBindings, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions)
     {
         VkPipelineVertexInputStateCreateInfo createInfo {};
         createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        createInfo.vertexAttributeDescriptionCount = 0;
-        createInfo.pVertexAttributeDescriptions = nullptr;
-        createInfo.vertexBindingDescriptionCount = 0;
-        createInfo.pVertexBindingDescriptions = nullptr;
+        createInfo.vertexBindingDescriptionCount = (uint32_t)vertexBindings.size();
+        createInfo.pVertexBindingDescriptions = vertexBindings.data();
+        createInfo.vertexAttributeDescriptionCount = (uint32_t)attributeDescriptions.size();
+        createInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
         return createInfo;
     }

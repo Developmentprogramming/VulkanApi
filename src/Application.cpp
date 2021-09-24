@@ -14,6 +14,38 @@ namespace VulkanApi
 {
 #define MAX_FRAMES 2
 
+    struct Vertex
+    {
+        glm::vec3 Position;
+
+        static VkVertexInputBindingDescription GetBindingDescription()
+        {
+            VkVertexInputBindingDescription bindingDescription {};
+            bindingDescription.binding = 0;
+            bindingDescription.stride = sizeof(Vertex);
+            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            return bindingDescription;
+        }
+
+        static VkVertexInputAttributeDescription GetAttributeDescription()
+        {
+            VkVertexInputAttributeDescription attributeDescription {};
+            attributeDescription.binding = 0;
+            attributeDescription.location = 0;
+            attributeDescription.offset = offsetof(Vertex, Position);
+            attributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
+
+            return attributeDescription;
+        }
+    };
+
+    static std::vector<Vertex> vertices = {
+            { {  0.0f, -0.5f, 0.0f } },
+            { {  0.5f,  0.5f, 0.0f } },
+            { { -0.5f,  0.5f, 0.0f } }
+    };
+
     Application::Application()
         : Window(800, 600),
         m_Instance(CreateRef<Instance, const std::initializer_list<const char*>&>({ "VK_LAYER_KHRONOS_validation" })),
@@ -30,16 +62,16 @@ namespace VulkanApi
         m_PresentQueue = CreateRef<Queue>();
         m_PresentQueue->GetDeviceQueue(m_Device, indices.presentFamily.value());
 
-       m_ImageAvailableSemaphore.reserve(MAX_FRAMES);
-       m_RenderFinishedSemaphore.reserve(MAX_FRAMES);
-       m_InFlightFences.reserve(MAX_FRAMES);
+        m_ImageAvailableSemaphore.reserve(MAX_FRAMES);
+        m_RenderFinishedSemaphore.reserve(MAX_FRAMES);
+        m_InFlightFences.reserve(MAX_FRAMES);
 
-       for (uint32_t i = 0; i < MAX_FRAMES; i++)
-       {
-           m_ImageAvailableSemaphore.emplace_back(m_Device);
-           m_RenderFinishedSemaphore.emplace_back(m_Device);
-           m_InFlightFences.emplace_back(m_Device);
-       }
+        for (uint32_t i = 0; i < MAX_FRAMES; i++)
+        {
+            m_ImageAvailableSemaphore.emplace_back(m_Device);
+            m_RenderFinishedSemaphore.emplace_back(m_Device);
+            m_InFlightFences.emplace_back(m_Device);
+        }
 
         CreateSwapChain();
         m_ImagesInFlight.reserve(m_SwapChain->GetImages().size());
@@ -78,7 +110,7 @@ namespace VulkanApi
         dynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 
         m_GraphicsPipeline = CreateRef<Pipeline>(m_Device, m_RenderPass, m_Shader,
-                                                 GraphicsPipeline::GetVertexInputStateCreateInfo(),
+                                                 GraphicsPipeline::GetVertexInputStateCreateInfo({ Vertex::GetBindingDescription() }, { Vertex::GetAttributeDescription() }),
                                                  GraphicsPipeline::GetInputAssemblyCreateInfo(),
                                                  GraphicsPipeline::GetViewportStateCreateInfo({ viewport }, { scissor }),
                                                  GraphicsPipeline::GetRasterizationStateCreateInfo(),
@@ -89,7 +121,13 @@ namespace VulkanApi
         m_SwapChain->CreateFrameBuffers(*m_RenderPass);
         m_CommandPool = CreateRef<CommandPool>(m_Device);
         m_CommandBuffers = CreateRef<CommandBuffers>(m_CommandPool, m_SwapChain, m_RenderPass, m_GraphicsPipeline);
-        m_CommandBuffers->Begin();
+        if (!m_BuffersInitialized)
+        {
+            uint64_t bufferSize = sizeof(vertices[0]) * vertices.size();
+            m_VertexBuffer = CreateRef<VertexBuffer>(m_Device, m_CommandBuffers, m_GraphicsQueue, vertices.data(), bufferSize);
+            m_BuffersInitialized = true;
+        }
+        m_CommandBuffers->Begin({ m_VertexBuffer });
 
         // Destroy shader modules
         m_Shader->ReleaseModules();
@@ -155,7 +193,7 @@ namespace VulkanApi
         submitInfo.pSignalSemaphores = signalSemaphore;
 
         m_InFlightFences[m_CurrentFrame].Reset();
-        if (vkQueueSubmit(m_GraphicsQueue->GetVkQueue(), 1, &submitInfo, m_InFlightFences[m_CurrentFrame].GetVkFence()) != VK_SUCCESS)
+        if (m_GraphicsQueue->Submit({ submitInfo }, m_InFlightFences[m_CurrentFrame]) != VK_SUCCESS)
             throw std::runtime_error("Failed to submit to graphics queue!");
 
         VkPresentInfoKHR presentInfoKhr {};
@@ -168,7 +206,7 @@ namespace VulkanApi
         presentInfoKhr.pSwapchains = swapChain;
         presentInfoKhr.pImageIndices = &imageIndex;
 
-        result = vkQueuePresentKHR(m_PresentQueue->GetVkQueue(), &presentInfoKhr);
+        result = m_PresentQueue->PresentKHR(presentInfoKhr);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_FrameBufferResized)
         {
             m_FrameBufferResized = false;

@@ -16,6 +16,7 @@
 #include "Core/CommandBuffers.h"
 #include "Core/Semaphore.h"
 #include "Core/Fence.h"
+#include "Core/Buffer.h"
 
 namespace VulkanApi
 {
@@ -48,7 +49,9 @@ namespace VulkanApi
         std::vector<Semaphore> m_ImageAvailableSemaphore, m_RenderFinishedSemaphore;
         std::vector<Fence> m_InFlightFences, m_ImagesInFlight;
 
-        bool m_FrameBufferResized = false;
+        Ref<VertexBuffer> m_VertexBuffer;
+
+        bool m_FrameBufferResized = false, m_BuffersInitialized = false;
         uint32_t m_CurrentFrame = 0;
     };
 }

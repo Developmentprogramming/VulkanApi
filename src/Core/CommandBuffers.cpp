@@ -6,6 +6,8 @@
 
 #include <stdexcept>
 
+#include "Buffer.h"
+
 namespace VulkanApi
 {
 
@@ -27,7 +29,7 @@ namespace VulkanApi
         vkFreeCommandBuffers(m_CommandPool->GetDevice()->GetVkDevice(), m_CommandPool->GetVkCommandPool(), (uint32_t)m_CommandBuffers.size(), m_CommandBuffers.data());
     }
 
-    void CommandBuffers::Begin() const
+    void CommandBuffers::Begin(const std::vector<Ref<Buffer>>& buffers) const
     {
         for (size_t i = 0; i < m_CommandBuffers.size(); i++)
         {
@@ -53,6 +55,8 @@ namespace VulkanApi
             vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->GetVkPipeline());
+            for (auto& buffer : buffers)
+                buffer->Bind(i);
             vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
