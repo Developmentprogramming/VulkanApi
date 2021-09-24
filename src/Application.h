@@ -50,6 +50,7 @@ namespace VulkanApi
         std::vector<Fence> m_InFlightFences, m_ImagesInFlight;
 
         Ref<VertexBuffer> m_VertexBuffer;
+        Ref<IndexBuffer> m_IndexBuffer;
 
         bool m_FrameBufferResized = false, m_BuffersInitialized = false;
         uint32_t m_CurrentFrame = 0;

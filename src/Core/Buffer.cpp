@@ -13,7 +13,7 @@ namespace VulkanApi
 
     Buffer::Buffer(const Ref<Device>& device, const Ref<CommandPool>& commandPool, const Ref<Queue>& graphicsQueue,
                    VkDeviceSize bufferSize, VkBufferUsageFlags usage, void* data)
-        : m_Device(device), m_CommandPool(commandPool), m_GraphicsQueue(graphicsQueue)
+        : m_Device(device), m_CommandPool(commandPool), m_GraphicsQueue(graphicsQueue), m_BufferUsage(usage)
     {
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingMemory;
@@ -126,5 +126,20 @@ namespace VulkanApi
         VkBuffer vertexBuffers[] = { GetVkBuffer() };
         VkDeviceSize offsets[] = { 0 };
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    }
+
+    // ============================================================================================
+    // Index Buffer ===============================================================================
+    // ============================================================================================
+
+    IndexBuffer::IndexBuffer(const Ref<Device> &device, const Ref<CommandPool> &commandPool, const Ref<Queue> &graphicsQueue, void *data, uint32_t count)
+        : Buffer(device, commandPool, graphicsQueue, count * sizeof(uint32_t), VK_BUFFER_USAGE_INDEX_BUFFER_BIT, data),
+        m_IndexCount(count)
+    {
+    }
+
+    void IndexBuffer::Bind(const VkCommandBuffer& commandBuffer) const
+    {
+        vkCmdBindIndexBuffer(commandBuffer, GetVkBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
 }

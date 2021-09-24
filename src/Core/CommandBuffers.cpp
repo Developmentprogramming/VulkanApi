@@ -55,9 +55,23 @@ namespace VulkanApi
             vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->GetVkPipeline());
+            bool drawIndexed = false;
+            uint32_t indexCount;
             for (auto& buffer : buffers)
+            {
                 buffer->Bind(m_CommandBuffers[i]);
-            vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
+                if (buffer->GetVkBufferUsage() == VK_BUFFER_USAGE_INDEX_BUFFER_BIT)
+                {
+                    auto ibo = reinterpret_cast<IndexBuffer*>(buffer.get());
+                    drawIndexed = true;
+                    indexCount = ibo->GetIndexCount();
+                }
+            }
+
+            if (drawIndexed)
+                vkCmdDrawIndexed(m_CommandBuffers[i], indexCount, 1, 0, 0, 0);
+            else
+                vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
 

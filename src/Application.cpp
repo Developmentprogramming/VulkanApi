@@ -46,6 +46,10 @@ namespace VulkanApi
             { { -0.5f,  0.5f, 0.0f } }
     };
 
+    static uint32_t indices[] = {
+            0, 1, 2
+    };
+
     Application::Application()
         : Window(800, 600),
         m_Instance(CreateRef<Instance, const std::initializer_list<const char*>&>({ "VK_LAYER_KHRONOS_validation" })),
@@ -125,9 +129,10 @@ namespace VulkanApi
         {
             uint64_t bufferSize = sizeof(vertices[0]) * vertices.size();
             m_VertexBuffer = CreateRef<VertexBuffer>(m_Device, m_CommandPool, m_GraphicsQueue, vertices.data(), bufferSize);
+            m_IndexBuffer = CreateRef<IndexBuffer>(m_Device, m_CommandPool, m_GraphicsQueue, indices, 3);
             m_BuffersInitialized = true;
         }
-        m_CommandBuffers->Begin({ m_VertexBuffer });
+        m_CommandBuffers->Begin({ m_VertexBuffer, m_IndexBuffer });
 
         // Destroy shader modules
         m_Shader->ReleaseModules();
