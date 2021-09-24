@@ -56,7 +56,7 @@ namespace VulkanApi
 
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->GetVkPipeline());
             for (auto& buffer : buffers)
-                buffer->Bind(i);
+                buffer->Bind(m_CommandBuffers[i]);
             vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);

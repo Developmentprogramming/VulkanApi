@@ -124,7 +124,7 @@ namespace VulkanApi
         if (!m_BuffersInitialized)
         {
             uint64_t bufferSize = sizeof(vertices[0]) * vertices.size();
-            m_VertexBuffer = CreateRef<VertexBuffer>(m_Device, m_CommandBuffers, m_GraphicsQueue, vertices.data(), bufferSize);
+            m_VertexBuffer = CreateRef<VertexBuffer>(m_Device, m_CommandPool, m_GraphicsQueue, vertices.data(), bufferSize);
             m_BuffersInitialized = true;
         }
         m_CommandBuffers->Begin({ m_VertexBuffer });

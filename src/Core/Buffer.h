@@ -18,7 +18,7 @@ namespace VulkanApi
     public:
         virtual ~Buffer();
 
-        virtual void Bind(uint32_t index) const = 0;
+        virtual void Bind(const VkCommandBuffer& commandBuffer) const = 0;
 
         inline Ref<Device> GetDevice() { return m_Device; }
 
@@ -26,14 +26,14 @@ namespace VulkanApi
         inline const VkDeviceMemory& GetVkDeviceMemory() const { return m_BufferMemory; }
 
     protected:
-        Buffer(const Ref<Device>& device, const Ref<CommandBuffers>& commandBuffers, const Ref<Queue>& graphicsQueue, VkDeviceSize bufferSize, VkBufferUsageFlags usage, void* data);
+        Buffer(const Ref<Device>& device, const Ref<CommandPool>& commandPool, const Ref<Queue>& graphicsQueue, VkDeviceSize bufferSize, VkBufferUsageFlags usage, void* data);
         void CreateBuffer(VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void CopyBuffer(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size);
 
     protected:
         Ref<Device> m_Device;
-        Ref<CommandBuffers> m_CommandBuffers;
+        Ref<CommandPool> m_CommandPool;
         Ref<Queue> m_GraphicsQueue;
 
     private:
@@ -44,9 +44,9 @@ namespace VulkanApi
     class VertexBuffer : public Buffer
     {
     public:
-        VertexBuffer(const Ref<Device>& device, const Ref<CommandBuffers>& commandBuffers, const Ref<Queue>& graphicsQueue, void* data, uint64_t bufferSize);
+        VertexBuffer(const Ref<Device>& device, const Ref<CommandPool>& commandPool, const Ref<Queue>& graphicsQueue, void* data, uint64_t bufferSize);
 
-        void Bind(uint32_t index) const override;
+        void Bind(const VkCommandBuffer& commandBuffer) const override;
     };
 }
 

@@ -11,9 +11,9 @@
 namespace VulkanApi
 {
 
-    Buffer::Buffer(const Ref<Device>& device, const Ref<CommandBuffers>& commandBuffers, const Ref<Queue>& graphicsQueue,
+    Buffer::Buffer(const Ref<Device>& device, const Ref<CommandPool>& commandPool, const Ref<Queue>& graphicsQueue,
                    VkDeviceSize bufferSize, VkBufferUsageFlags usage, void* data)
-        : m_Device(device), m_CommandBuffers(commandBuffers), m_GraphicsQueue(graphicsQueue)
+        : m_Device(device), m_CommandPool(commandPool), m_GraphicsQueue(graphicsQueue)
     {
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingMemory;
@@ -80,7 +80,7 @@ namespace VulkanApi
         VkCommandBufferAllocateInfo commandBufferAllocateInfo {};
         commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        commandBufferAllocateInfo.commandPool = m_CommandBuffers->GetCommandPool()->GetVkCommandPool();
+        commandBufferAllocateInfo.commandPool = m_CommandPool->GetVkCommandPool();
         commandBufferAllocateInfo.commandBufferCount = 1;
 
         VkCommandBuffer commandBuffer;
@@ -109,22 +109,22 @@ namespace VulkanApi
         m_GraphicsQueue->Submit({ submitInfo });
         m_GraphicsQueue->WaitIdle();
 
-        vkFreeCommandBuffers(m_Device->GetVkDevice(), m_CommandBuffers->GetCommandPool()->GetVkCommandPool(), 1, &commandBuffer);
+        vkFreeCommandBuffers(m_Device->GetVkDevice(), m_CommandPool->GetVkCommandPool(), 1, &commandBuffer);
     }
 
     // ============================================================================================
     // Vertex Buffer ==============================================================================
     // ============================================================================================
 
-    VertexBuffer::VertexBuffer(const Ref<Device> &device, const Ref<CommandBuffers>& commandBuffers, const Ref<Queue> &graphicsQueue, void *data, uint64_t bufferSize)
-        : Buffer(device, commandBuffers, graphicsQueue, bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data)
+    VertexBuffer::VertexBuffer(const Ref<Device> &device, const Ref<CommandPool>& commandPool, const Ref<Queue> &graphicsQueue, void *data, uint64_t bufferSize)
+        : Buffer(device, commandPool, graphicsQueue, bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data)
     {
     }
 
-    void VertexBuffer::Bind(uint32_t index) const
+    void VertexBuffer::Bind(const VkCommandBuffer &commandBuffer) const
     {
         VkBuffer vertexBuffers[] = { GetVkBuffer() };
         VkDeviceSize offsets[] = { 0 };
-        vkCmdBindVertexBuffers(m_CommandBuffers->GetCommandBuffers()[index], 0, 1, vertexBuffers, offsets);
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     }
 }
